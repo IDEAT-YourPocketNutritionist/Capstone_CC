@@ -1,0 +1,690 @@
+openapi: 3.0.3
+info:
+  title: API Dokumentasi IDEAT
+  version: 1.0.0
+  description: Dokumentasi untuk endpoint Aplikasi IDEAT
+paths:
+  /register:
+    post:
+      summary: Register pengguna baru
+      description: Endpoint untuk mendaftarkan pengguna baru.
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nama
+                - email
+                - password
+                - confirmPassword
+              properties:
+                nama:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        "200":
+          description: User berhasil didaftarkan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: User berhasil terdaftar
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nama:
+                        type: string
+                        example: user
+                      token:
+                        type: string
+                        example: abcdef123456
+        "400":
+          description: Validasi input gagal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          nama:
+                            type: array
+                            example:
+                              - Nama tidak boleh kosong
+                              - Nama hanya boleh berisi huruf dan spasi
+                          email:
+                            type: array
+                            example:
+                              - Email sudah terdaftar
+                              - Email tidak boleh kosong
+                          password:
+                            type: array
+                            example:
+                              - Password harus minimal 6 karakter
+                          confirmPassword:
+                            type: array
+                            example:
+                              - Konfirmasi password harus sama dengan password
+                  data:
+                    type: null
+                    example: null
+      security: []
+
+  /profile:
+    get:
+      summary: Mendapatkan data profil pengguna
+      description: Endpoint untuk mendapatkan data profil pengguna yang diotentikasi.
+      tags:
+        - Profil
+      responses:
+        "200":
+          description: Data profil pengguna berhasil didapatkan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Data profil berhasil didapatkan
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nama:
+                        type: string
+                        example: user
+                      email:
+                        type: string
+                        example: user@example.com
+                      jenisKelamin:
+                        type: string
+                        example: Laki-laki
+                      tanggalLahir:
+                        type: string
+                        format: date-time
+                        example: "2024-11-22"
+                      beratBadan:
+                        type: integer
+                        example: 80
+                      tinggiBadan:
+                        type: integer
+                        example: 178
+        "400":
+          description: Terjadi kesalahan validasi atau token tidak valid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          token:
+                            type: array
+                            example:
+                              - Authorization header missing
+                              - Invalid token
+                          id:
+                            type: array
+                            example:
+                              - User not found
+                  data:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: x
+      security:
+        - Bearer_token: []
+
+    put:
+      summary: Update profil pengguna
+      description: Endpoint untuk memperbarui profil pengguna.
+      tags:
+        - Profil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                email:
+                  type: string
+                jenisKelamin:
+                  type: string
+                tanggalLahir:
+                  type: string
+                  format: date
+                beratBadan:
+                  type: integer
+                tinggiBadan:
+                  type: integer
+              required:
+                - nama
+                - email
+                - jenisKelamin
+                - tanggalLahir
+                - beratBadan
+                - tinggiBadan
+      responses:
+        "200":
+          description: Profil berhasil diperbarui.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Profile user berhasil diperbarui
+                  data:
+                    type: null
+                    example: null
+        "400":
+          description: Validasi input gagal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          nama:
+                            type: array
+                            example:
+                              - Nama tidak boleh kosong
+                              - Nama harus minimal 3 karakter
+                              - Nama hanya boleh berisi huruf dan spasi
+                          email:
+                            type: array
+                            example:
+                              - Email tidak boleh kosong
+                              - Email harus dalam format yang valid
+                              - Email sudah digunakan
+                          jenisKelamin:
+                            type: array
+                            example:
+                              - Jenis kelamin tidak boleh kosong
+                              - Jenis kelamin harus Laki-laki atau Perempuan
+                          tanggalLahir:
+                            type: array
+                            example:
+                              - Tanggal lahir harus dalam format tanggal yang valid
+                              - Tanggal lahir harus dalam format YYYY-MM-DD
+                              - Tanggal lahir harus sebelum hari ini.
+                              - Tanggal lahir tidak boleh kosong
+                          beratBadan:
+                            type: array
+                            example:
+                              - Berat badan harus berupa angka
+                              - Berat badan tidak boleh kosong
+                              - Berat badan harus lebih dari 0
+                          tinggiBadan:
+                            type: array
+                            example:
+                              - Tinggi badan harus berupa angka
+                              - Tinggi badan harus lebih dari 0
+                              - Tinggi badan tidak boleh kosong
+                          token:
+                            type: array
+                            example:
+                              - Authorization header missing
+                              - Invalid token
+                  data:
+                    type: null
+                    example: null
+      security:
+        - Bearer_token: []
+
+  /login:
+    post:
+      summary: Login pengguna
+      description: Endpoint untuk login pengguna.
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login berhasil.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Login berhasil
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: abcdef123456
+        "400":
+          description: Validasi input gagal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          email:
+                            type: array
+                            example:
+                              - Email tidak boleh kosong
+                              - Email harus dalam format yang valid
+                              - Email tidak terdaftar
+                          password:
+                            type: array
+                            example:
+                              - Password harus minimal 6 karakter
+                              - Password tidak boleh kosong
+                              - Password Salah
+
+                  data:
+                    type: null
+                    example: null
+      security: []
+
+  /password:
+    put:
+      summary: Mengubah password
+      description: Endpoint untuk mengubah password pengguna yang diotentikasi.
+      tags:
+        - Profil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                confirmNewPassword:
+                  type: string
+              required:
+                - oldPassword
+                - newPassword
+                - confirmNewPassword
+      responses:
+        "200":
+          description: Password pengguna berhasil diubah.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Password berhasil diubah
+                  data:
+                    type: null
+                    example: null
+        "400":
+          description: Validasi input gagal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          oldPassword:
+                            type: array
+                            example:
+                              - Password lama tidak boleh kosong
+                              - Password lama harus minimal 6 karakter
+                              - Password lama salah
+                          newPassword:
+                            type: array
+                            example:
+                              - Password baru tidak boleh kosong
+                              - Password baru harus minimal 6 karakter
+                          confirmNewPassword:
+                            type: array
+                            example:
+                              - Konfirmasi password baru tidak boleh kosong
+                              - Konfirmasi password baru harus sama dengan password
+                          token:
+                            type: array
+                            example:
+                              - Authorization header missing
+                              - Invalid token
+                  data:
+                    type: null
+                    example: null
+      security:
+        - Bearer_token: []
+
+  /scan:
+    post:
+      summary: prediksi makanan
+      description: Endpoint untuk memprediksi makanan.
+      tags:
+        - Prediksi
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+      responses:
+        "200":
+          description: scan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Gambar Berhasil Diprediksi
+                  data:
+                    type: object
+                    properties:
+                      makanan:
+                        type: string
+                      kalori:
+                        type: string
+                      image:
+                        type: string
+        "400":
+          description: Validasi input gagal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          image:
+                            type: array
+                            example:
+                              - image tidak ditemukan
+                              - Format gambar tidak valid. Hanya mendukung JPEG/PNG.
+                            makanan:
+                              type: array
+                              example:
+                                - Makanan tidak dikenali.
+                          token:
+                            type: array
+                            example:
+                              - Authorization header missing
+                              - Invalid token
+
+                  data:
+                    type: null
+                    example: null
+      security:
+        - Bearer_token: []
+
+  /logout:
+    get:
+      summary: Logout Pengguna
+      description: Endpoint untuk logout pengguna yang diotentikasi.
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+      responses:
+        "200":
+          description: Logout.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Logout successful
+                  data:
+                    type: null
+                    example: null
+        "400":
+          description: Validasi input gagal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          token:
+                            type: array
+                            example:
+                              - Authorization header missing
+                              - Invalid token
+
+                  data:
+                    type: null
+                    example: null
+      security:
+        - Bearer_token: []
+
+  /historyScan:
+    get:
+      summary: Mendapatkan semua riwayat scan pengguna
+      description: Endpoint ini digunakan untuk mendapatkan semua riwayat scan dari pengguna yang sedang login.
+      tags:
+        - Prediksi
+      responses:
+        "200":
+          description: Data riwayat scan berhasil ditemukan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: data history berhasil ditemukan
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      example:
+                        id_history: "yyyyy"
+                        makanan: "nama makanan"
+                        kalori: "1010"
+                        tanggal: "2024-10-10"
+                        image: "https:/xxxxxx"
+
+        "404":
+          description: Data riwayat scan tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: data history tidak ditemukan
+                  data:
+                    type: array
+                    example: []
+
+      security:
+        - BearerAuth: []
+
+  /historyScan/{idHistory}:
+    get:
+      summary: Mendapatkan detail riwayat scan berdasarkan ID
+      description: Endpoint ini digunakan untuk mendapatkan detail riwayat scan tertentu berdasarkan ID.
+      tags:
+        - Prediksi
+      parameters:
+        - in: path
+          name: idHistory
+          required: true
+          schema:
+            type: string
+          description: ID dari riwayat scan yang ingin diambil.
+      responses:
+        "200":
+          description: Detail riwayat scan berhasil ditemukan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Data history berhasil ditemukan.
+                  data:
+                    type: object
+                    example:
+                      id_history: "yyyyy"
+                      makanan: "nama makanan"
+                      kalori: "1010"
+                      tanggal: "2024-10-10"
+                      image: "https:/xxxxxx"
+        "404":
+          description: Riwayat scan dengan ID tersebut tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                        properties:
+                          history:
+                            type: array
+                            items:
+                              type: string
+                            example:
+                              - History dengan ID ${idHistory} tidak ditemukan.
+
+                  data:
+                    type: null
+                    example: null
+
+      security:
+        - BearerAuth: []
+
+components:
+  securitySchemes:
+    Bearer_token:
+      type: http
+      scheme: bearer
+security:
+  - Bearer_token: []
