@@ -13,6 +13,7 @@ This project is the final part of Bangkit Academy. This project involves creatin
 - jsonwebtoken (untuk otentifikasi dengan jwt)
 - bcryptjs (untuk enkripsi password)
 - Joi (untuk validasi data)
+- firestore
 
 ## documentation
 
