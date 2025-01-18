@@ -1,64 +1,35 @@
-import db from '../config/db.js';
+import db from "../config/db.js";
 
-export const updateProfile = async (request, h) => {
-  const { id } = request.user; // ID pengguna dari token
-  const { nama, jenisKelamin, tanggalLahir, beratBadan, tinggiBadan } = request.payload;
+const updateProfile = async(request, h)=>{
+    const id = request.user.id;
+    const { nama, jenisKelamin, tanggalLahir, beratBadan, tinggiBadan } = request.payload;
 
-  try {
-     // Periksa apakah pengguna dengan ID yang diberikan ada
-    const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
-    if (rows.length === 0) {
-      return h.response({ 
-        status:'fail',
-        message:{
-          errors: {
-            id:[
-                    'User tidak ditemukan'
-                ]
-          }
-        },
-        data:null
-      }).code(404);
+     //mencari user berdasarkan id
+    const queryUser = await db.collection('users').doc(id);
+    const dataUser = await queryUser.get();
+
+    //verifikasi apakah user ada
+    if(!dataUser.exists){
+        return h.response({
+            status:'fail',
+            message:'User tidak ditemukan',
+            data:null
+        }).code(404);
     }
-    const user = rows[0];
+    //user ditemukan
+    await queryUser.update({
+        nama:nama || dataUser.data().nama,
+        jenis_kelamin:jenisKelamin || dataUser.data().jenis_kelamin,
+        tanggal_lahir:tanggalLahir || dataUser.data().tanggal_lahir,
+        tinggi_badan:tinggiBadan || dataUser.data().tinggi_badan,
+        berat_badan:beratBadan || dataUser.data().berat_badan,
+    });
 
-    // // Periksa apakah email sudah digunakan oleh pengguna lain
-    // const [emailCheck] = await db.query('SELECT * FROM users WHERE email = ? AND id != ?', [email, id]);
-    // if (emailCheck.length > 0) {
-    //   return h.response({ 
-    //     status:'fail',
-    //     message:{
-    //       errors: {
-    //         email:[
-    //             'Email sudah digunakan'
-    //         ]
-    //       }
-    //     },
-    //     data:{
-    //       request_email:email,
-    //     }
-    //   }).code(400);
-    // }
-
-    // Update profil pengguna
-    await db.query(
-      `UPDATE users 
-       SET nama = ?, email = ?, jenis_kelamin = ?, tanggal_lahir = ?, berat_badan = ?, tinggi_badan = ? 
-       WHERE id = ?`,
-      [nama, user.email, jenisKelamin, tanggalLahir, beratBadan, tinggiBadan, id]
-    );
-
-    return h.response({ 
-      status:'success',
-      message: 'Profile user berhasil diperbarui' ,
-      data:null
-    }).code(200);
-  } catch (error) {
-    console.error(error);
     return h.response({
-        status:'fail',
-        message:'Internal Server Error',
+        status:'success',
+        message:'Profile user berhasil diperbarui',
         data:null
-    }).code(500);
-  }
+    }).code(200);
 };
+
+export default updateProfile;

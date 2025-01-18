@@ -1,48 +1,68 @@
 # capstone cloud computing api
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IDEAT-YourPocketNutritionist/.github/main/profile/IDEAT_Cover.png">
+</p>
+
+---
 
 ## overview
 
-This project is the final part of Bangkit Academy. This project involves creating APIs for machine learning models, login, register.
+This project is the final part of Bangkit Academy. This project involves creating an API for the IDEAT application.
 
 ## packages used in the project
 
 - Hapi.js
 - dotenv
-- mysql2
-- jsonwebtoken (untuk otentifikasi dengan jwt)
-- bcryptjs (untuk enkripsi password)
-- Joi (untuk validasi data)
-- firestore
+- @google-cloud/firestore
+- @google-cloud/storage
+- jsonwebtoken
+- bcryptjs
+- Joi
+- Axios
+- Jest
 
 ## documentation
 
-[Documentation](https://app.swaggerhub.com/apis-docs/C344B4KY1948/dokumentasi-api-ideat/1.0.0)
+☁️ [Documentation API IDEAT](https://documenter.getpostman.com/view/30953348/2sAYJ4k22H)
 
+## GCP Config Service
+
+- Firestore
+- Cloud Storage
 
 ## installation
 
-1. clone the repository:
+1. Download & Install cloud SDK
+
+   ⚙️ [Download](https://cloud.google.com/sdk/docs/install?hl=id)
+
+2. clone the repository:
+
    ```sh
-   git clone https://github.com/ilhanmanzis/bangkit-app-project
+   git clone https://github.com/ilhanmanzis/ideat
    ```
 
-2. copy file .env.example menjadi .env, kemudian isi yang diperlukan didalam file .env
+3. copy file .env.example menjadi .env, kemudian isi yang diperlukan didalam file .env
+
    ```sh
    cp .env.example .env
    ```
 
-3. Install the required packages
+4. Install the required packages
+
    ```sh
    npm install
    ```
 
-4. migration database
+5. Config Cloud SDK
+
    ```sh
-   npm run migration
+   gcloud init
    ```
 
-5. how to run
+6. how to run
+
    - development
      ```sh
      npm run dev
@@ -51,3 +71,8 @@ This project is the final part of Bangkit Academy. This project involves creatin
      ```sh
      npm run start
      ```
+
+7. Run test
+   ```sh
+    npm run test
+   ```

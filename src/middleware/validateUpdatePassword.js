@@ -7,17 +7,14 @@ export const validateUpdatePassword = (schema) => {
       // Kelompokkan pesan kesalahan berdasarkan field
       const errorMessage = error.details.reduce((acc, err) => {
         const field = err.path[0]; // Mendapatkan nama field yang bermasalah
-        if (!acc[field]) {
-          acc[field] = []; // Buat array baru untuk field jika belum ada
-        }
-        acc[field].push(err.message); // Tambahkan pesan ke array field
+        acc[field] = err.message; // Simpan pesan kesalahan untuk field tersebut
         return acc;
       }, {});
 
       return h.response({ 
         status: 'fail',
-        message:{errors: errorMessage },
-        data:null
+        message: { errors: errorMessage },
+        data: null,
       }).code(400).takeover();
     }
     return h.continue;

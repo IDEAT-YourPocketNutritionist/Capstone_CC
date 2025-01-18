@@ -7,4 +7,4 @@ function getCurrentDate() {
     return `${year}-${month}-${day}`;
 }
 
-export default getCurrentDate
+export default getCurrentDate;

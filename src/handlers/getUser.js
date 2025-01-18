@@ -1,30 +1,23 @@
-import db from "../config/db.js";
+import db from "../config/db.js"
 
-const getUser = async(request, h) =>{
+const getUser = async(request,h)=>{
     const id = request.user.id;
+    
+    //mencari user berdasarkan id
+    const queryUser = await db.collection('users').doc(id);
+    const dataUser = await queryUser.get();
 
-    try {
-       // Periksa apakah pengguna dengan ID yang diberikan ada
-    const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
-    if (rows.length === 0) {
-      return h.response({
-        status:'fail' ,
-        message:{
-            errors: {
-                id:[
-                    'User tidak ditemukan'
-                ]
-            }
-        },
-        data:{
-            request_id:id,
-        }
+    //verifikasi apakah user ada
+    if(!dataUser.exists){
+        return h.response({
+            status:'fail',
+            message:'User tidak ditemukan',
+            data:null
         }).code(404);
     }
 
-    const user = rows[0];
-     // Format respons dengan data pengguna
-
+    //user ditemukan
+    const user = dataUser.data();
     return h.response({
         status:'success',
         message:'Data profil berhasil didapatkan',
@@ -38,14 +31,6 @@ const getUser = async(request, h) =>{
             tinggiBadan: user.tinggi_badan,
         }
     }).code(200);
-    } catch (error) {
-        console.error(error);
-        return h.response({
-            status:'fail',
-            message:'Internal Server Error',
-            data:null
-        }).code(500);
-    }
-};
+}
 
 export default getUser;

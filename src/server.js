@@ -1,26 +1,52 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import routes from "./routes.js";
 import Hapi from "@hapi/hapi";
+import routes from "./routes.js";
 
-
-const init = async()=>{
+(async()=>{
     const server = Hapi.server({
-        port : process.env.PORT || 5000,
-        host : process.env.NODE_ENV !== "production" ?  'localhost' : '0.0.0.0',
+        port: process.env.PORT || 8080,
+        host: process.env.NODE_ENV !== 'production' ? 'localhost':'0.0.0.0',
         routes:{
             cors:{
-                origin:['*'],
+                origin:['*']
             }
         }
     });
 
     server.route(routes);
-    await server.start();
-    console.log("============================================================");  
-    console.log(`server run is ${server.info.uri}`);
-    console.log("============================================================");
-}
+    server.ext('onPreResponse', function (request, h){
+        const response = request.response;
 
-init();
+        if(response.isBoom){
+            if (statusCode >= 500) {
+            console.error('Server Error:', response.stack); // Log error untuk debugging
+
+            // Buat respons khusus untuk kesalahan server
+            const newResponse = h.response({
+                status: 'error',
+                message: 'Terjadi kesalahan pada server. Silakan coba lagi nanti.',
+                data: null,
+            });
+            newResponse.code(500);
+            return newResponse;
+        }
+
+        // Jika error adalah kesalahan client (4xx)
+        const newResponse = h.response({
+            status: 'fail',
+            message: response.message,
+            data: null,
+        });
+            newResponse.code(response.statusCode);
+            return newResponse;
+        }
+        return h.continue;
+    })
+
+
+    await server.start();
+    console.log(`server run is ${server.info.uri}`);
+
+})();

@@ -1,29 +1,18 @@
-import { Firestore } from "@google-cloud/firestore";
+import db from "../config/db.js";
 
-const dbf = new Firestore();
-
-async function store_data(idUser, idHistory, historyData) {
+const saveFireStore = async(idUser, idHistory, historyData)=>{
     try {
+        const userDoc = await db.collection('users').doc(idUser);
 
-         // Koleksi "users"
-        const userCollection = dbf.collection('users');
-        //console.log('Collection users tersedia.');
 
-        // Dokumen user berdasarkan idUser
-        const userDoc = userCollection.doc(idUser);
-        //console.log(`Dokumen untuk user ${idUser} tersedia.`);
+        const historyCollection =await userDoc.collection('history');
+        const historyDoc = await historyCollection.doc(idHistory);
 
-        // Subcollection "history"
-        const historyCollection = userDoc.collection('history');
-        const historyDoc = historyCollection.doc(idHistory);
-
-        // Menyimpan data ke Firestore
+         // Menyimpan data ke Firestore
         await historyDoc.set(historyData);
-        //console.log(`Data history dengan ID ${idHistory} berhasil ditambahkan.`);
     } catch (error) {
         console.error("Error saat menyimpan data:", error.message);
     }
 }
 
-
-export default store_data;
+export default saveFireStore;

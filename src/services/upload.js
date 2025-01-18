@@ -3,8 +3,6 @@ import getFormattedFileName from "./formatFile.js";
 
 const storage = new Storage();
 
-
-
 async function getOrCreateBucket(bucketName){
     const bucket = await storage.bucket(bucketName);
     try {
@@ -18,7 +16,7 @@ async function getOrCreateBucket(bucketName){
 
         //CREATE BUCKET
         await storage.createBucket(bucketName, optionsCreateBucket);
-        console.log(`${bucketName} bucke created successfully`);
+        console.log(`${bucketName} bucket created successfully`);
         return bucket;
     }
 };
@@ -52,12 +50,5 @@ async function upload(filePath, bucket, userId, imageName){
     }
     
 }
-
-
-
-
-
-
-
 
 export  {getOrCreateBucket, upload};

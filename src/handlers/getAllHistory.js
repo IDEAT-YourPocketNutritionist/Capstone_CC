@@ -1,42 +1,31 @@
-import { Firestore } from "@google-cloud/firestore";
+import db from "../config/db.js";
 
-const dbf = new Firestore();
 const getAllHistory = async(request, h)=>{
-    const id = `${request.user.id}`;
+    const id = request.user.id;
 
-    try {
-        const historyCollection = dbf.collection('users').doc(id).collection('history');
+    const queryHistory = await db.collection('users').doc(id).collection('history');
+    const snapshot = await queryHistory.get();
 
-        const snapshot = await historyCollection.get();
-        if (snapshot.empty) {
-            console.log(`Tidak ada data history untuk user dengan ID ${id}.`);
-            return h.response({
-                status:'fail',
-                message:'data history tidak ditemukan',
-                data:[]
-            }).code(404);
-        }
-
-        // Memproses data menjadi array dengan atribut yang diperlukan saja
-        const histories = snapshot.docs.map(doc => {
-                const { id_history, makanan, kalori, image } = doc.data();
-                return { id_history, makanan, kalori, image }; // Hanya menyertakan atribut tertentu
-        });
-
-        return h.response({
-            status:'success',
-            message:'data history berhasil ditemukan',
-            data:histories
-        }).code(200);
-    } catch (error) {
-        console.error(error);
+    //verifikasi apakah data history ada/tidak
+    if(snapshot.empty){
+        console.log(`Data history user ${request.user.email} tidak ada`);
         return h.response({
             status:'fail',
-            message:'Internal Server Error',
+            message:'Data history tidak ditemukan',
             data:null
-        }).code(500);   
-    }
+        }).code(404);
+    };
 
+    //memproses data menjadi array dengan atribut yang diperlukan saja
+    const historyes = snapshot.docs.map(doc=>{
+        const {id_history, makanan, kalori, image } = doc.data();
+        return {id_history, makanan, kalori, image } //hanya menyertakan atribut tertentu
+    });
+
+    return h.response({
+        status:'success', 
+        message:'Data history berhasil ditemukan',
+        data:historyes
+    }).code(200);
 }
-
-export default getAllHistory
+export default getAllHistory;
